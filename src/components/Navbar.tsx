@@ -45,10 +45,10 @@ const Navbar = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuItem as={Link} to="/dashboard" className="cursor-pointer">
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => window.location.href = '/dashboard'}>
                     Dashboard
                   </DropdownMenuItem>
-                  <DropdownMenuItem as={Link} to="/profile" className="cursor-pointer">
+                  <DropdownMenuItem className="cursor-pointer" onClick={() => window.location.href = '/profile'}>
                     Profile
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
