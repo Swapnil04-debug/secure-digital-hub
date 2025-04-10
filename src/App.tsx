@@ -12,6 +12,9 @@ import Transactions from "./pages/Transactions";
 import AccountDetail from "./pages/AccountDetail";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+import ContactUs from "./pages/ContactUs";
+import Contact from "./pages/Contact";
 import { AuthProvider } from "./context/AuthContext";
 import { BankProvider } from "./context/BankContext";
 
@@ -33,6 +36,9 @@ const App = () => (
               <Route path="/transactions" element={<Transactions />} />
               <Route path="/accounts/:id" element={<AccountDetail />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact-us" element={<ContactUs />} />
+              <Route path="/contact" element={<Contact />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

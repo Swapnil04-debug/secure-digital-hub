@@ -13,6 +13,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from '@/components/ui/navigation-menu';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -24,6 +33,54 @@ const Navbar = () => {
           <Link to="/">
             <Logo />
           </Link>
+          <div className="hidden md:ml-8 md:flex">
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <Link to="/" className={navigationMenuTriggerStyle()}>
+                    Home
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/about" className={navigationMenuTriggerStyle()}>
+                    About
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger>Services</NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                      {[
+                        { title: 'Personal Banking', description: 'Banking solutions for individuals', link: '/' },
+                        { title: 'Business Banking', description: 'Banking solutions for businesses', link: '/' },
+                        { title: 'Loans', description: 'Personal and business loans', link: '/' },
+                        { title: 'Investments', description: 'Grow your money with us', link: '/' },
+                      ].map((item) => (
+                        <li key={item.title}>
+                          <NavigationMenuLink asChild>
+                            <a
+                              href={item.link}
+                              className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                            >
+                              <div className="text-sm font-medium leading-none">{item.title}</div>
+                              <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                {item.description}
+                              </p>
+                            </a>
+                          </NavigationMenuLink>
+                        </li>
+                      ))}
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/contact-us" className={navigationMenuTriggerStyle()}>
+                    Contact Us
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
         </div>
 
         <div className="flex items-center space-x-4">
