@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Bell, ChevronDown } from 'lucide-react';
+import { Menu, Bell, ChevronDown, Database } from 'lucide-react';
 import Logo from './Logo';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
@@ -76,6 +76,12 @@ const Navbar = () => {
                 <NavigationMenuItem>
                   <Link to="/contact-us" className={navigationMenuTriggerStyle()}>
                     Contact Us
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link to="/database-users" className={navigationMenuTriggerStyle()}>
+                    <Database className="mr-2 h-4 w-4" />
+                    User Database
                   </Link>
                 </NavigationMenuItem>
               </NavigationMenuList>
