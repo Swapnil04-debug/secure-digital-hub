@@ -1,5 +1,5 @@
 
-// This service will communicate with your Python backend API
+// This service provides mock user data for demonstration purposes
 
 interface User {
   id: number;
@@ -9,7 +9,7 @@ interface User {
 }
 
 /*
- * This service interacts with a normalized database schema that includes:
+ * This service mimics interaction with a normalized database schema that includes:
  * - Users: Core user data (credentials, personal info)
  * - UserProfiles: Extended user information (contact details, preferences)
  * - AccountTypes: Different account categories (Savings, Checking, etc.)
@@ -19,18 +19,24 @@ interface User {
  * - Transfers: Records of money movements between accounts
  */
 
-// Replace with your actual Python backend URL
-const API_URL = "http://localhost:5000/api";
+// Mock data to simulate backend responses
+const mockUsers: User[] = [
+  { id: 1, name: "John Doe", email: "john@example.com", balance: 5000 },
+  { id: 2, name: "Jane Smith", email: "jane@example.com", balance: 7500 },
+  { id: 3, name: "Michael Johnson", email: "michael@example.com", balance: 2300 },
+  { id: 4, name: "Sarah Williams", email: "sarah@example.com", balance: 10250 },
+];
+
+// Simulate API delays for more realistic behavior
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const UserDataService = {
   // Get all users
   getAllUsers: async (): Promise<User[]> => {
     try {
-      const response = await fetch(`${API_URL}/users`);
-      if (!response.ok) {
-        throw new Error(`HTTP error: ${response.status}`);
-      }
-      return await response.json();
+      // Simulate network delay
+      await delay(600);
+      return [...mockUsers];
     } catch (error) {
       console.error("Error fetching users:", error);
       throw error;
@@ -40,11 +46,12 @@ export const UserDataService = {
   // Get user by ID
   getUserById: async (id: number): Promise<User> => {
     try {
-      const response = await fetch(`${API_URL}/users/${id}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error: ${response.status}`);
+      await delay(400);
+      const user = mockUsers.find(user => user.id === id);
+      if (!user) {
+        throw new Error("User not found");
       }
-      return await response.json();
+      return {...user};
     } catch (error) {
       console.error(`Error fetching user ${id}:`, error);
       throw error;
@@ -54,17 +61,24 @@ export const UserDataService = {
   // Create new user
   createUser: async (userData: Omit<User, "id">): Promise<User> => {
     try {
-      const response = await fetch(`${API_URL}/users`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error: ${response.status}`);
+      await delay(800);
+      // Check if email already exists
+      if (mockUsers.some(user => user.email === userData.email)) {
+        throw new Error("Email already exists");
       }
-      return await response.json();
+      
+      // Generate new ID (in a real API this would be handled by the database)
+      const newId = Math.max(...mockUsers.map(user => user.id), 0) + 1;
+      
+      const newUser: User = {
+        id: newId,
+        ...userData
+      };
+      
+      // Add to mock database
+      mockUsers.push(newUser);
+      
+      return {...newUser};
     } catch (error) {
       console.error("Error creating user:", error);
       throw error;
@@ -74,17 +88,29 @@ export const UserDataService = {
   // Update user
   updateUser: async (id: number, userData: Partial<User>): Promise<User> => {
     try {
-      const response = await fetch(`${API_URL}/users/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error: ${response.status}`);
+      await delay(600);
+      const userIndex = mockUsers.findIndex(user => user.id === id);
+      
+      if (userIndex === -1) {
+        throw new Error("User not found");
       }
-      return await response.json();
+      
+      // Check for email uniqueness if changing email
+      if (
+        userData.email && 
+        userData.email !== mockUsers[userIndex].email && 
+        mockUsers.some(user => user.email === userData.email)
+      ) {
+        throw new Error("Email already exists");
+      }
+      
+      // Update user
+      mockUsers[userIndex] = {
+        ...mockUsers[userIndex],
+        ...userData
+      };
+      
+      return {...mockUsers[userIndex]};
     } catch (error) {
       console.error(`Error updating user ${id}:`, error);
       throw error;
@@ -94,15 +120,24 @@ export const UserDataService = {
   // Delete user
   deleteUser: async (id: number): Promise<void> => {
     try {
-      const response = await fetch(`${API_URL}/users/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error: ${response.status}`);
+      await delay(500);
+      const userIndex = mockUsers.findIndex(user => user.id === id);
+      
+      if (userIndex === -1) {
+        throw new Error("User not found");
       }
+      
+      // Remove user
+      mockUsers.splice(userIndex, 1);
     } catch (error) {
       console.error(`Error deleting user ${id}:`, error);
       throw error;
     }
   },
+
+  // Health check - always returns connected for mock service
+  checkHealth: async (): Promise<{ status: string }> => {
+    await delay(300);
+    return { status: "ok" };
+  }
 };
