@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, Smartphone, Users, Building, Headset, CreditCard } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Smartphone, Users, Building, Headset, CreditCard, Briefcase, Wallet, TrendingUp } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -47,6 +47,84 @@ const Index = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services Preview Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Our Banking Services</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Discover our range of AI-powered banking solutions designed to meet your financial needs.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Personal Banking */}
+            <div className="bg-blue-50 rounded-lg p-6 text-center hover:shadow-md transition-all">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CreditCard className="h-8 w-8 text-bank-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Personal Banking</h3>
+              <p className="text-gray-600 mb-4">Smart AI-powered solutions for your everyday banking needs.</p>
+              <Button asChild variant="outline" className="w-full border-bank-primary text-bank-primary hover:bg-bank-primary hover:text-white">
+                <Link to="/services" className="flex items-center justify-center">
+                  Learn More <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+
+            {/* Business Banking */}
+            <div className="bg-indigo-50 rounded-lg p-6 text-center hover:shadow-md transition-all">
+              <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Briefcase className="h-8 w-8 text-bank-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Business Banking</h3>
+              <p className="text-gray-600 mb-4">Advanced tools to help your business grow and thrive.</p>
+              <Button asChild variant="outline" className="w-full border-bank-primary text-bank-primary hover:bg-bank-primary hover:text-white">
+                <Link to="/services" className="flex items-center justify-center">
+                  Learn More <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+
+            {/* Loans */}
+            <div className="bg-green-50 rounded-lg p-6 text-center hover:shadow-md transition-all">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Wallet className="h-8 w-8 text-bank-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Loans</h3>
+              <p className="text-gray-600 mb-4">Fast approvals with AI-based eligibility assessment.</p>
+              <Button asChild variant="outline" className="w-full border-bank-primary text-bank-primary hover:bg-bank-primary hover:text-white">
+                <Link to="/services" className="flex items-center justify-center">
+                  Learn More <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+
+            {/* Investments */}
+            <div className="bg-amber-50 rounded-lg p-6 text-center hover:shadow-md transition-all">
+              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <TrendingUp className="h-8 w-8 text-bank-primary" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Investments</h3>
+              <p className="text-gray-600 mb-4">AI-guided investment solutions for better returns.</p>
+              <Button asChild variant="outline" className="w-full border-bank-primary text-bank-primary hover:bg-bank-primary hover:text-white">
+                <Link to="/services" className="flex items-center justify-center">
+                  Learn More <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Button asChild className="bg-bank-primary hover:bg-bank-primary/90">
+              <Link to="/services" className="flex items-center">
+                View All Services <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>

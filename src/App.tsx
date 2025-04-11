@@ -16,6 +16,7 @@ import About from "./pages/About";
 import ContactUs from "./pages/ContactUs";
 import Contact from "./pages/Contact";
 import DatabaseUsers from "./pages/DatabaseUsers";
+import Services from "./pages/Services";
 import { AuthProvider } from "./context/AuthContext";
 import { BankProvider } from "./context/BankContext";
 
@@ -41,6 +42,7 @@ const App = () => (
               <Route path="/contact-us" element={<ContactUs />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/database-users" element={<DatabaseUsers />} />
+              <Route path="/services" element={<Services />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

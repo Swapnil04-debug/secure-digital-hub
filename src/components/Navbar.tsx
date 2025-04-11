@@ -42,6 +42,11 @@ const Navbar = () => {
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
+                  <Link to="/services" className={navigationMenuTriggerStyle()}>
+                    Services
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
                   <Link to="/about" className={navigationMenuTriggerStyle()}>
                     About
                   </Link>
@@ -51,10 +56,10 @@ const Navbar = () => {
                   <NavigationMenuContent>
                     <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                       {[
-                        { title: 'Personal Banking', description: 'Banking solutions for individuals', link: '/' },
-                        { title: 'Business Banking', description: 'Banking solutions for businesses', link: '/' },
-                        { title: 'Loans', description: 'Personal and business loans', link: '/' },
-                        { title: 'Investments', description: 'Grow your money with us', link: '/' },
+                        { title: 'Personal Banking', description: 'Banking solutions for individuals', link: '/services' },
+                        { title: 'Business Banking', description: 'Banking solutions for businesses', link: '/services' },
+                        { title: 'Loans', description: 'Personal and business loans', link: '/services' },
+                        { title: 'Investments', description: 'Grow your money with us', link: '/services' },
                       ].map((item) => (
                         <li key={item.title}>
                           <NavigationMenuLink asChild>
