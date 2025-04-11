@@ -17,6 +17,10 @@ import ContactUs from "./pages/ContactUs";
 import Contact from "./pages/Contact";
 import DatabaseUsers from "./pages/DatabaseUsers";
 import Services from "./pages/Services";
+import PersonalBanking from "./pages/PersonalBanking";
+import BusinessBanking from "./pages/BusinessBanking";
+import Loans from "./pages/Loans";
+import Investments from "./pages/Investments";
 import { AuthProvider } from "./context/AuthContext";
 import { BankProvider } from "./context/BankContext";
 
@@ -43,6 +47,10 @@ const App = () => (
               <Route path="/contact" element={<Contact />} />
               <Route path="/database-users" element={<DatabaseUsers />} />
               <Route path="/services" element={<Services />} />
+              <Route path="/personal-banking" element={<PersonalBanking />} />
+              <Route path="/business-banking" element={<BusinessBanking />} />
+              <Route path="/loans" element={<Loans />} />
+              <Route path="/investments" element={<Investments />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

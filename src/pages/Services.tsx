@@ -12,9 +12,9 @@ const Services = () => {
     {
       icon: <CreditCard className="h-8 w-8 text-bank-primary" />,
       title: "Smart Personal Banking, Simplified",
-      description: "Manage your everyday banking with ease using our AI-enhanced personal banking solutions. Enjoy secure transactions, real-time insights, and personalized financial guidance—all in one place.",
+      description: "Manage your everyday banking with ease using our enhanced personal banking solutions. Enjoy secure transactions, real-time insights, and personalized financial guidance—all in one place.",
       features: [
-        "AI-powered expense tracking and budget insights",
+        "Expense tracking and budget insights",
         "Instant savings & current account setup",
         "UPI, card, and net banking support",
         "Personalized offers and rewards"
@@ -25,11 +25,11 @@ const Services = () => {
     },
     {
       icon: <Briefcase className="h-8 w-8 text-bank-primary" />,
-      title: "Business Banking, Reimagined with AI",
+      title: "Business Banking, Reimagined",
       description: "Grow your business with smart financial tools tailored for modern enterprises. From smart invoicing to automated cash flow analysis, we help businesses thrive with technology.",
       features: [
         "Multi-user business accounts with role management",
-        "AI-driven cash flow forecasting",
+        "Cash flow forecasting",
         "Smart invoicing and transaction categorization",
         "Business credit card & overdraft facility",
         "GST-ready statements & compliance tracking"
@@ -41,9 +41,9 @@ const Services = () => {
     {
       icon: <Wallet className="h-8 w-8 text-bank-primary" />,
       title: "Easy Loans, Smart Approvals",
-      description: "Get instant access to loans with our AI-based eligibility engine. We make borrowing easy, fast, and transparent—tailored to your needs and financial history.",
+      description: "Get instant access to loans with our eligibility engine. We make borrowing easy, fast, and transparent—tailored to your needs and financial history.",
       features: [
-        "AI-based loan approval within minutes",
+        "Loan approval within minutes",
         "Flexible EMI plans with real-time calculators",
         "Personal, business, and home loan options",
         "Paperless documentation & digital KYC",
@@ -56,9 +56,9 @@ const Services = () => {
     {
       icon: <TrendingUp className="h-8 w-8 text-bank-primary" />,
       title: "Smarter Investments, Better Returns",
-      description: "Let AI guide your investment journey—from mutual funds to stocks and savings. Get personalized portfolio suggestions based on your goals and risk appetite.",
+      description: "Let us guide your investment journey—from mutual funds to stocks and savings. Get personalized portfolio suggestions based on your goals and risk appetite.",
       features: [
-        "AI-driven portfolio recommendations",
+        "Data-driven portfolio recommendations",
         "Mutual Funds, SIPs, Stocks, and Bonds",
         "Real-time market tracking & alerts",
         "Risk assessment & goal-based planning",
@@ -80,7 +80,7 @@ const Services = () => {
           <div className="max-w-3xl mx-auto text-center text-white">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Banking Services</h1>
             <p className="text-xl">
-              Discover our comprehensive range of AI-powered financial services designed to meet your needs.
+              Discover our comprehensive range of financial services designed to meet your needs.
             </p>
           </div>
         </div>
@@ -131,12 +131,12 @@ const Services = () => {
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-4">Need Help Choosing the Right Service?</h2>
             <p className="text-gray-600 mb-8">
-              Our AI-powered financial advisor can help you find the perfect banking solution based on your needs.
+              Our financial advisor can help you find the perfect banking solution based on your needs.
               Try our recommendation tool or speak to one of our experts today.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button className="bg-bank-primary hover:bg-bank-primary/90">
-                <Link to="/advisor">Use AI Advisor</Link>
+                <Link to="/contact-us">Use Advisor</Link>
               </Button>
               <Button variant="outline" className="border-bank-primary text-bank-primary hover:bg-bank-primary hover:text-white">
                 <Link to="/contact-us">Speak to an Expert</Link>
