@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserDataService } from "@/services/UserDataService";
@@ -31,7 +30,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Loader2, UserPlus, Edit, Trash2 } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { Loader2, UserPlus, Edit, Trash2, Database } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
 interface User {
@@ -47,6 +58,17 @@ interface UserFormData {
   balance: string;
 }
 
+interface TableSchema {
+  name: string;
+  description: string;
+  columns: {
+    name: string;
+    type: string;
+    constraints: string;
+    description: string;
+  }[];
+}
+
 const DatabaseUsers = () => {
   const queryClient = useQueryClient();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -60,8 +82,107 @@ const DatabaseUsers = () => {
   const [connectionStatus, setConnectionStatus] = useState<
     "checking" | "connected" | "failed"
   >("checking");
+  const [showSchemaInfo, setShowSchemaInfo] = useState(false);
 
-  // Check connection to Python backend
+  const databaseSchema: TableSchema[] = [
+    {
+      name: "Users",
+      description: "Stores core user authentication and identity information",
+      columns: [
+        { name: "user_id", type: "INTEGER", constraints: "PRIMARY KEY, AUTO_INCREMENT", description: "Unique identifier for each user" },
+        { name: "username", type: "VARCHAR(50)", constraints: "NOT NULL, UNIQUE", description: "User's login name" },
+        { name: "email", type: "VARCHAR(100)", constraints: "NOT NULL, UNIQUE", description: "User's email address" },
+        { name: "password_hash", type: "VARCHAR(255)", constraints: "NOT NULL", description: "Securely hashed password" },
+        { name: "first_name", type: "VARCHAR(50)", constraints: "NOT NULL", description: "User's first name" },
+        { name: "last_name", type: "VARCHAR(50)", constraints: "NOT NULL", description: "User's last name" },
+        { name: "date_created", type: "TIMESTAMP", constraints: "DEFAULT CURRENT_TIMESTAMP", description: "When the user account was created" },
+        { name: "last_login", type: "TIMESTAMP", constraints: "NULL", description: "Last successful login time" },
+        { name: "is_active", type: "BOOLEAN", constraints: "DEFAULT TRUE", description: "Whether the user account is active" }
+      ]
+    },
+    {
+      name: "UserProfiles",
+      description: "Contains extended user information",
+      columns: [
+        { name: "profile_id", type: "INTEGER", constraints: "PRIMARY KEY, AUTO_INCREMENT", description: "Unique identifier for each profile" },
+        { name: "user_id", type: "INTEGER", constraints: "FOREIGN KEY (Users.user_id)", description: "Reference to the Users table" },
+        { name: "address", type: "VARCHAR(200)", constraints: "NULL", description: "User's street address" },
+        { name: "city", type: "VARCHAR(100)", constraints: "NULL", description: "User's city" },
+        { name: "state", type: "VARCHAR(50)", constraints: "NULL", description: "User's state/province" },
+        { name: "postal_code", type: "VARCHAR(20)", constraints: "NULL", description: "User's ZIP/postal code" },
+        { name: "country", type: "VARCHAR(50)", constraints: "NULL", description: "User's country" },
+        { name: "phone_number", type: "VARCHAR(20)", constraints: "NULL", description: "User's contact number" },
+        { name: "date_of_birth", type: "DATE", constraints: "NULL", description: "User's birth date" },
+        { name: "profile_picture_url", type: "VARCHAR(255)", constraints: "NULL", description: "URL to profile picture" }
+      ]
+    },
+    {
+      name: "AccountTypes",
+      description: "Defines different types of bank accounts",
+      columns: [
+        { name: "account_type_id", type: "INTEGER", constraints: "PRIMARY KEY, AUTO_INCREMENT", description: "Unique identifier for account types" },
+        { name: "type_name", type: "VARCHAR(50)", constraints: "NOT NULL, UNIQUE", description: "Name of account type (Savings, Checking, etc.)" },
+        { name: "description", type: "VARCHAR(255)", constraints: "NOT NULL", description: "Description of account type" },
+        { name: "interest_rate", type: "DECIMAL(5,2)", constraints: "DEFAULT 0.00", description: "Interest rate for this account type" },
+        { name: "minimum_balance", type: "DECIMAL(10,2)", constraints: "DEFAULT 0.00", description: "Required minimum balance" }
+      ]
+    },
+    {
+      name: "Accounts",
+      description: "Bank accounts owned by users",
+      columns: [
+        { name: "account_id", type: "INTEGER", constraints: "PRIMARY KEY, AUTO_INCREMENT", description: "Unique identifier for each account" },
+        { name: "user_id", type: "INTEGER", constraints: "FOREIGN KEY (Users.user_id)", description: "User who owns this account" },
+        { name: "account_type_id", type: "INTEGER", constraints: "FOREIGN KEY (AccountTypes.account_type_id)", description: "Type of this account" },
+        { name: "account_number", type: "VARCHAR(20)", constraints: "NOT NULL, UNIQUE", description: "Unique account number" },
+        { name: "balance", type: "DECIMAL(12,2)", constraints: "NOT NULL DEFAULT 0.00", description: "Current account balance" },
+        { name: "currency_code", type: "CHAR(3)", constraints: "NOT NULL DEFAULT 'USD'", description: "Currency of the account" },
+        { name: "is_active", type: "BOOLEAN", constraints: "DEFAULT TRUE", description: "Whether the account is active" },
+        { name: "date_opened", type: "TIMESTAMP", constraints: "DEFAULT CURRENT_TIMESTAMP", description: "When the account was opened" },
+        { name: "date_closed", type: "TIMESTAMP", constraints: "NULL", description: "When the account was closed (if applicable)" }
+      ]
+    },
+    {
+      name: "TransactionTypes",
+      description: "Types of financial transactions",
+      columns: [
+        { name: "transaction_type_id", type: "INTEGER", constraints: "PRIMARY KEY, AUTO_INCREMENT", description: "Unique identifier for transaction types" },
+        { name: "type_name", type: "VARCHAR(50)", constraints: "NOT NULL, UNIQUE", description: "Name of transaction type (Deposit, Withdrawal, etc.)" },
+        { name: "description", type: "VARCHAR(255)", constraints: "NOT NULL", description: "Description of this transaction type" },
+        { name: "affects_balance", type: "VARCHAR(10)", constraints: "NOT NULL", description: "How it affects balance (credit, debit, both)" }
+      ]
+    },
+    {
+      name: "Transactions",
+      description: "Record of all financial transactions",
+      columns: [
+        { name: "transaction_id", type: "INTEGER", constraints: "PRIMARY KEY, AUTO_INCREMENT", description: "Unique identifier for each transaction" },
+        { name: "account_id", type: "INTEGER", constraints: "FOREIGN KEY (Accounts.account_id)", description: "Account involved in transaction" },
+        { name: "transaction_type_id", type: "INTEGER", constraints: "FOREIGN KEY (TransactionTypes.transaction_type_id)", description: "Type of transaction" },
+        { name: "amount", type: "DECIMAL(12,2)", constraints: "NOT NULL", description: "Amount of the transaction" },
+        { name: "running_balance", type: "DECIMAL(12,2)", constraints: "NOT NULL", description: "Account balance after transaction" },
+        { name: "description", type: "VARCHAR(255)", constraints: "NULL", description: "Transaction description or notes" },
+        { name: "transaction_date", type: "TIMESTAMP", constraints: "DEFAULT CURRENT_TIMESTAMP", description: "When the transaction occurred" },
+        { name: "status", type: "VARCHAR(20)", constraints: "DEFAULT 'completed'", description: "Transaction status" },
+        { name: "reference_number", type: "VARCHAR(50)", constraints: "UNIQUE", description: "Unique reference for the transaction" }
+      ]
+    },
+    {
+      name: "Transfers",
+      description: "Records transfers between accounts",
+      columns: [
+        { name: "transfer_id", type: "INTEGER", constraints: "PRIMARY KEY, AUTO_INCREMENT", description: "Unique identifier for each transfer" },
+        { name: "transaction_id", type: "INTEGER", constraints: "FOREIGN KEY (Transactions.transaction_id)", description: "Associated transaction" },
+        { name: "from_account_id", type: "INTEGER", constraints: "FOREIGN KEY (Accounts.account_id)", description: "Source account" },
+        { name: "to_account_id", type: "INTEGER", constraints: "FOREIGN KEY (Accounts.account_id)", description: "Destination account" },
+        { name: "amount", type: "DECIMAL(12,2)", constraints: "NOT NULL", description: "Amount transferred" },
+        { name: "transfer_date", type: "TIMESTAMP", constraints: "DEFAULT CURRENT_TIMESTAMP", description: "When the transfer occurred" },
+        { name: "status", type: "VARCHAR(20)", constraints: "DEFAULT 'completed'", description: "Transfer status" },
+        { name: "notes", type: "VARCHAR(255)", constraints: "NULL", description: "Any notes about the transfer" }
+      ]
+    }
+  ];
+
   useEffect(() => {
     const checkConnection = async () => {
       try {
@@ -81,7 +202,6 @@ const DatabaseUsers = () => {
     checkConnection();
   }, []);
 
-  // Query for fetching all users
   const {
     data: users,
     isLoading,
@@ -92,7 +212,6 @@ const DatabaseUsers = () => {
     enabled: connectionStatus === "connected",
   });
 
-  // Mutation for creating a user
   const createUserMutation = useMutation({
     mutationFn: UserDataService.createUser,
     onSuccess: () => {
@@ -113,7 +232,6 @@ const DatabaseUsers = () => {
     },
   });
 
-  // Mutation for updating a user
   const updateUserMutation = useMutation({
     mutationFn: ({ id, userData }: { id: number; userData: Partial<User> }) =>
       UserDataService.updateUser(id, userData),
@@ -135,7 +253,6 @@ const DatabaseUsers = () => {
     },
   });
 
-  // Mutation for deleting a user
   const deleteUserMutation = useMutation({
     mutationFn: UserDataService.deleteUser,
     onSuccess: () => {
@@ -154,7 +271,6 @@ const DatabaseUsers = () => {
     },
   });
 
-  // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -163,7 +279,6 @@ const DatabaseUsers = () => {
     }));
   };
 
-  // Handle form submission for new user
   const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
     const userData = {
@@ -174,7 +289,6 @@ const DatabaseUsers = () => {
     createUserMutation.mutate(userData);
   };
 
-  // Handle form submission for editing user
   const handleEditUser = (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUserId) return;
@@ -187,7 +301,6 @@ const DatabaseUsers = () => {
     updateUserMutation.mutate({ id: currentUserId, userData });
   };
 
-  // Open edit dialog and populate form with user data
   const openEditDialog = (user: User) => {
     setCurrentUserId(user.id);
     setFormData({
@@ -198,7 +311,6 @@ const DatabaseUsers = () => {
     setIsEditDialogOpen(true);
   };
 
-  // Reset form data
   const resetForm = () => {
     setFormData({
       name: "",
@@ -435,94 +547,198 @@ if __name__ == '__main__':
       <div className="flex-grow container mx-auto py-8 px-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900">User Database</h1>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-bank-primary hover:bg-bank-primary/90">
-                <UserPlus className="mr-2 h-4 w-4" /> Add User
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add New User</DialogTitle>
-                <DialogDescription>
-                  Enter the details of the new user to add to the database.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleAddUser}>
-                <div className="space-y-4 py-4">
-                  <div className="space-y-2">
-                    <label htmlFor="name" className="text-sm font-medium">
-                      Full Name
-                    </label>
-                    <Input
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      placeholder="John Doe"
-                      required
-                    />
+          <div className="flex space-x-2">
+            <Button 
+              variant="outline"
+              onClick={() => setShowSchemaInfo(!showSchemaInfo)}
+              className="flex items-center gap-2"
+            >
+              <Database className="h-4 w-4" />
+              {showSchemaInfo ? "Hide Schema" : "Show Schema"}
+            </Button>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-bank-primary hover:bg-bank-primary/90">
+                  <UserPlus className="mr-2 h-4 w-4" /> Add User
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New User</DialogTitle>
+                  <DialogDescription>
+                    Enter the details of the new user to add to the database.
+                  </DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleAddUser}>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <label htmlFor="name" className="text-sm font-medium">
+                        Full Name
+                      </label>
+                      <Input
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        placeholder="John Doe"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="email" className="text-sm font-medium">
+                        Email
+                      </label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder="john@example.com"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label htmlFor="balance" className="text-sm font-medium">
+                        Balance
+                      </label>
+                      <Input
+                        id="balance"
+                        name="balance"
+                        type="number"
+                        step="0.01"
+                        value={formData.balance}
+                        onChange={handleInputChange}
+                        placeholder="0.00"
+                        required
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium">
-                      Email
-                    </label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      placeholder="john@example.com"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="balance" className="text-sm font-medium">
-                      Balance
-                    </label>
-                    <Input
-                      id="balance"
-                      name="balance"
-                      type="number"
-                      step="0.01"
-                      value={formData.balance}
-                      onChange={handleInputChange}
-                      placeholder="0.00"
-                      required
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setIsAddDialogOpen(false);
-                      resetForm();
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="bg-bank-primary hover:bg-bank-primary/90"
-                    disabled={createUserMutation.isPending}
-                  >
-                    {createUserMutation.isPending ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating...
-                      </>
-                    ) : (
-                      "Create User"
-                    )}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
+                  <DialogFooter>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setIsAddDialogOpen(false);
+                        resetForm();
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="bg-bank-primary hover:bg-bank-primary/90"
+                      disabled={createUserMutation.isPending}
+                    >
+                      {createUserMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Creating...
+                        </>
+                      ) : (
+                        "Create User"
+                      )}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
+        
+        {showSchemaInfo && (
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Database Schema</CardTitle>
+              <CardDescription>
+                Complete relational database structure for the banking application
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="tables">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="tables">Table Structure</TabsTrigger>
+                  <TabsTrigger value="erd">Entity Relationships</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="tables">
+                  <Accordion type="single" collapsible className="w-full">
+                    {databaseSchema.map((table, index) => (
+                      <AccordionItem key={index} value={`table-${index}`}>
+                        <AccordionTrigger className="font-medium">
+                          <span className="flex items-center">
+                            <Database className="h-4 w-4 mr-2" /> {table.name}
+                          </span>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="p-2 mb-3 bg-gray-50 rounded-md">
+                            <p className="text-sm text-gray-600">{table.description}</p>
+                          </div>
+                          <div className="overflow-x-auto">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>Column Name</TableHead>
+                                  <TableHead>Data Type</TableHead>
+                                  <TableHead>Constraints</TableHead>
+                                  <TableHead>Description</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {table.columns.map((column, colIndex) => (
+                                  <TableRow key={colIndex}>
+                                    <TableCell className="font-mono text-sm">{column.name}</TableCell>
+                                    <TableCell className="font-mono text-sm">{column.type}</TableCell>
+                                    <TableCell className="font-mono text-sm">{column.constraints}</TableCell>
+                                    <TableCell className="text-sm">{column.description}</TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
+                </TabsContent>
+                
+                <TabsContent value="erd">
+                  <div className="p-4 bg-gray-50 rounded-md">
+                    <h3 className="text-lg font-semibold mb-4">Entity Relationship Diagram</h3>
+                    <div className="overflow-x-auto">
+                      <div className="min-w-[800px]">
+                        <pre className="p-4 bg-white rounded-md border text-xs leading-relaxed">
+{`Users (1) --< UserProfiles (1)
+      |
+      +---< Accounts (N)
+                |
+                +---< Transactions (N)
+                |        |
+                |        +--- TransactionTypes (1)
+                |
+                +---< Transfers (N) >---- Accounts (destination)
+                         |
+                         +---- Transactions (1)`}
+                        </pre>
+                        <div className="mt-4">
+                          <h4 className="font-medium text-sm mb-2">Relationship Legend:</h4>
+                          <ul className="text-sm list-disc ml-5 space-y-1">
+                            <li><span className="font-semibold">Users to UserProfiles</span>: One-to-one (Each user has one profile)</li>
+                            <li><span className="font-semibold">Users to Accounts</span>: One-to-many (A user can have multiple accounts)</li>
+                            <li><span className="font-semibold">Accounts to Transactions</span>: One-to-many (An account can have many transactions)</li>
+                            <li><span className="font-semibold">TransactionTypes to Transactions</span>: One-to-many (A transaction type can be used in many transactions)</li>
+                            <li><span className="font-semibold">Accounts to Transfers</span>: One-to-many (An account can be involved in many transfers)</li>
+                            <li><span className="font-semibold">Transactions to Transfers</span>: One-to-one (A transfer is associated with one transaction)</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
+        )}
 
         <Card>
           <CardHeader>
@@ -606,7 +822,6 @@ if __name__ == '__main__':
         </Card>
       </div>
 
-      {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>

@@ -8,6 +8,17 @@ interface User {
   balance: number;
 }
 
+/*
+ * This service interacts with a normalized database schema that includes:
+ * - Users: Core user data (credentials, personal info)
+ * - UserProfiles: Extended user information (contact details, preferences)
+ * - AccountTypes: Different account categories (Savings, Checking, etc.)
+ * - Accounts: Individual bank accounts owned by users
+ * - TransactionTypes: Categories of financial transactions
+ * - Transactions: Record of all financial activities
+ * - Transfers: Records of money movements between accounts
+ */
+
 // Replace with your actual Python backend URL
 const API_URL = "http://localhost:5000/api";
 
