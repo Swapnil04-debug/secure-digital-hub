@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Users, Shield, Award, Clock, Building, ChevronRight } from 'lucide-react';
@@ -95,7 +94,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* Our Team - Removed photos as requested */}
+      {/* Our Team */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-12 text-center">Our Team Members</h2>
@@ -118,7 +117,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* Tech Stack Section - Added as requested */}
+      {/* Tech Stack Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-10 text-center">Tech Stack and Frameworks Used</h2>
@@ -145,35 +144,6 @@ const About = () => {
                 </div>
               ))}
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* History Timeline */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-12 text-center">Our Journey</h2>
-          
-          <div className="max-w-4xl mx-auto">
-            {[
-              { year: "2005", title: "Foundation", description: "SecureBank was founded with a vision to transform digital banking." },
-              { year: "2010", title: "Expansion", description: "Opened 50 new branches across the country and launched our first mobile app." },
-              { year: "2015", title: "Innovation", description: "Introduced financial advisory services and contactless payments." },
-              { year: "2020", title: "Digital Transformation", description: "Completed our digital transformation and launched next-gen banking platform." },
-              { year: "2025", title: "Looking Forward", description: "Expanding globally with a focus on sustainable banking and financial inclusion." }
-            ].map((milestone, index) => (
-              <div key={index} className="flex mb-8 last:mb-0">
-                <div className="mr-4">
-                  <div className="w-16 h-16 bg-bank-primary rounded-full flex items-center justify-center text-white font-bold">
-                    {milestone.year}
-                  </div>
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow flex-1">
-                  <h3 className="text-xl font-semibold mb-2">{milestone.title}</h3>
-                  <p className="text-gray-600">{milestone.description}</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
