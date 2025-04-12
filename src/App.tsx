@@ -21,6 +21,7 @@ import PersonalBanking from "./pages/PersonalBanking";
 import BusinessBanking from "./pages/BusinessBanking";
 import Loans from "./pages/Loans";
 import Investments from "./pages/Investments";
+import ApplicationStatus from "./pages/ApplicationStatus";
 import { AuthProvider } from "./context/AuthContext";
 import { BankProvider } from "./context/BankContext";
 
@@ -51,6 +52,7 @@ const App = () => (
               <Route path="/business-banking" element={<BusinessBanking />} />
               <Route path="/loans" element={<Loans />} />
               <Route path="/investments" element={<Investments />} />
+              <Route path="/application-status" element={<ApplicationStatus />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

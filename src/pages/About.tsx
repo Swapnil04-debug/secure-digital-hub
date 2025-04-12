@@ -98,14 +98,16 @@ const About = () => {
       {/* Our Team */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-12 text-center">Our Leadership Team</h2>
+          <h2 className="text-3xl font-bold mb-12 text-center">Our Team Members</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { name: "Sarah Johnson", title: "Chief Executive Officer", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" },
-              { name: "Michael Chen", title: "Chief Financial Officer", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" },
-              { name: "David Rodriguez", title: "Chief Technology Officer", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" },
-              { name: "Emily Watson", title: "Chief Operating Officer", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" }
+              { name: "Swapnil Dixit", title: "Team Member", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" },
+              { name: "Shubham Raj", title: "Team Member", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" },
+              { name: "Shubham Khandelwal", title: "Team Member", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" },
+              { name: "Radhika", title: "Team Member", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" },
+              { name: "Sanchi", title: "Team Member", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" },
+              { name: "Jeevantika", title: "Team Member", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" }
             ].map((member, index) => (
               <div key={index} className="bg-white rounded-lg overflow-hidden shadow-md">
                 <img src={member.image} alt={member.name} className="w-full h-64 object-cover" />
@@ -119,8 +121,39 @@ const About = () => {
         </div>
       </section>
 
-      {/* History Timeline */}
+      {/* Tech Stack Section */}
       <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold mb-10 text-center">Tech Stack and Frameworks Used</h2>
+          
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
+              {[
+                { name: "HTML", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" },
+                { name: "CSS", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" },
+                { name: "JavaScript", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" },
+                { name: "React", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
+                { name: "TypeScript", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" },
+                { name: "Flask", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg" },
+                { name: "Python", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
+                { name: "Firebase", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg" },
+                { name: "SQL", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" },
+                { name: "DBMS", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" },
+                { name: "Git", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" },
+                { name: "GitHub", logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" }
+              ].map((tech, index) => (
+                <div key={index} className="bg-white p-6 rounded-lg shadow-md flex flex-col items-center">
+                  <img src={tech.logo} alt={tech.name} className="w-12 h-12 mb-4" />
+                  <h3 className="text-center font-medium">{tech.name}</h3>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* History Timeline */}
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-12 text-center">Our Journey</h2>
           
@@ -128,7 +161,7 @@ const About = () => {
             {[
               { year: "2005", title: "Foundation", description: "SecureBank was founded with a vision to transform digital banking." },
               { year: "2010", title: "Expansion", description: "Opened 50 new branches across the country and launched our first mobile app." },
-              { year: "2015", title: "Innovation", description: "Introduced AI-powered financial advisory services and contactless payments." },
+              { year: "2015", title: "Innovation", description: "Introduced financial advisory services and contactless payments." },
               { year: "2020", title: "Digital Transformation", description: "Completed our digital transformation and launched next-gen banking platform." },
               { year: "2025", title: "Looking Forward", description: "Expanding globally with a focus on sustainable banking and financial inclusion." }
             ].map((milestone, index) => (

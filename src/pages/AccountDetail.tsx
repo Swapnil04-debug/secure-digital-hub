@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { 
   ArrowUpRight, ArrowDownLeft, RefreshCw, 
-  ChevronLeft, AlertCircle, Download, Calendar, FileText
+  ChevronLeft, AlertCircle, Calendar, FileText
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,10 @@ import { useBank } from '@/context/BankContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 
 // Helper function to format currency
 const formatCurrency = (amount: number) => {
@@ -27,9 +31,22 @@ const formatCurrency = (amount: number) => {
 const AccountDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getAccountById, getAccountTransactions } = useBank();
+  const { toast } = useToast();
+  const { getAccountById, getAccountTransactions, deposit, withdraw, transfer } = useBank();
   const [transactionPeriod, setTransactionPeriod] = useState('all');
   
+  // Form states for dialogs
+  const [depositAmount, setDepositAmount] = useState<string>('');
+  const [withdrawAmount, setWithdrawAmount] = useState<string>('');
+  const [transferAmount, setTransferAmount] = useState<string>('');
+  const [recipientAccount, setRecipientAccount] = useState<string>('');
+  const [transferDescription, setTransferDescription] = useState<string>('');
+  
+  // Dialog states
+  const [depositDialogOpen, setDepositDialogOpen] = useState<boolean>(false);
+  const [withdrawDialogOpen, setWithdrawDialogOpen] = useState<boolean>(false);
+  const [transferDialogOpen, setTransferDialogOpen] = useState<boolean>(false);
+
   // Get account and transactions data
   const account = id ? getAccountById(id) : undefined;
   const allTransactions = id ? getAccountTransactions(id) : [];
@@ -70,6 +87,111 @@ const AccountDetail = () => {
     
   const netChange = totalDeposits - totalWithdrawals;
   
+  // Handle deposit submission
+  const handleDepositSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const amount = parseFloat(depositAmount);
+    
+    if (isNaN(amount) || amount <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please enter a valid amount greater than zero.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (id) {
+      const success = await deposit(id, amount, "Manual deposit");
+      if (success) {
+        setDepositAmount('');
+        setDepositDialogOpen(false);
+      }
+    }
+  };
+  
+  // Handle withdraw submission
+  const handleWithdrawSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const amount = parseFloat(withdrawAmount);
+    
+    if (isNaN(amount) || amount <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please enter a valid amount greater than zero.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (account && amount > account.balance) {
+      toast({
+        title: "Insufficient funds",
+        description: "You don't have enough balance for this withdrawal.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (id) {
+      const success = await withdraw(id, amount, "Manual withdrawal");
+      if (success) {
+        setWithdrawAmount('');
+        setWithdrawDialogOpen(false);
+      }
+    }
+  };
+  
+  // Handle transfer submission
+  const handleTransferSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const amount = parseFloat(transferAmount);
+    
+    if (isNaN(amount) || amount <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please enter a valid amount greater than zero.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!recipientAccount.trim()) {
+      toast({
+        title: "Missing information",
+        description: "Please enter a recipient account number.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (account && amount > account.balance) {
+      toast({
+        title: "Insufficient funds",
+        description: "You don't have enough balance for this transfer.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (id) {
+      // For demo purposes we're using the same account as recipient
+      // In a real app, you'd validate the recipient account exists
+      const transferDesc = transferDescription.trim() || "Funds transfer";
+      const success = await transfer(id, id, amount, transferDesc);
+      if (success) {
+        toast({
+          title: "Transfer successful",
+          description: `$${amount} transferred to Account No. ${recipientAccount.substring(0, 4)}****${recipientAccount.substring(recipientAccount.length - 4)}`
+        });
+        setTransferAmount('');
+        setRecipientAccount('');
+        setTransferDescription('');
+        setTransferDialogOpen(false);
+      }
+    }
+  };
+
   // Handle account not found
   if (!account) {
     return (
@@ -138,17 +260,148 @@ const AccountDetail = () => {
               </CardContent>
               <CardFooter className="border-t pt-4 flex justify-between">
                 <div className="flex space-x-2">
-                  <Button variant="outline" className="text-green-600 border-green-600 hover:bg-green-50">
-                    <ArrowDownLeft className="h-4 w-4 mr-2" /> Deposit
-                  </Button>
-                  <Button variant="outline" className="text-red-600 border-red-600 hover:bg-red-50">
-                    <ArrowUpRight className="h-4 w-4 mr-2" /> Withdraw
-                  </Button>
+                  <Dialog open={depositDialogOpen} onOpenChange={setDepositDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="text-green-600 border-green-600 hover:bg-green-50">
+                        <ArrowDownLeft className="h-4 w-4 mr-2" /> Deposit
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Deposit Funds</DialogTitle>
+                        <DialogDescription>
+                          Enter the amount you want to deposit to your account.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleDepositSubmit}>
+                        <div className="py-4">
+                          <Label htmlFor="deposit-amount">Amount</Label>
+                          <Input
+                            id="deposit-amount"
+                            placeholder="Enter amount"
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            value={depositAmount}
+                            onChange={(e) => setDepositAmount(e.target.value)}
+                            className="mt-2"
+                            required
+                          />
+                        </div>
+                        <DialogFooter>
+                          <Button type="submit" className="bg-green-600 hover:bg-green-700">
+                            Deposit
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                  
+                  <Dialog open={withdrawDialogOpen} onOpenChange={setWithdrawDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="text-red-600 border-red-600 hover:bg-red-50">
+                        <ArrowUpRight className="h-4 w-4 mr-2" /> Withdraw
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Withdraw Funds</DialogTitle>
+                        <DialogDescription>
+                          Enter the amount you want to withdraw from your account.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleWithdrawSubmit}>
+                        <div className="py-4">
+                          <Label htmlFor="withdraw-amount">Amount</Label>
+                          <Input
+                            id="withdraw-amount"
+                            placeholder="Enter amount"
+                            type="number"
+                            step="0.01"
+                            min="0.01"
+                            max={account.balance}
+                            value={withdrawAmount}
+                            onChange={(e) => setWithdrawAmount(e.target.value)}
+                            className="mt-2"
+                            required
+                          />
+                          <div className="text-sm text-gray-500 mt-2">
+                            Available balance: {formatCurrency(account.balance)}
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button type="submit" className="bg-red-600 hover:bg-red-700">
+                            Withdraw
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
                 </div>
                 <div>
-                  <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
-                    <RefreshCw className="h-4 w-4 mr-2" /> Transfer
-                  </Button>
+                  <Dialog open={transferDialogOpen} onOpenChange={setTransferDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
+                        <RefreshCw className="h-4 w-4 mr-2" /> Transfer
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                      <DialogHeader>
+                        <DialogTitle>Transfer Funds</DialogTitle>
+                        <DialogDescription>
+                          Enter the details for your fund transfer.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleTransferSubmit}>
+                        <div className="grid gap-4 py-4">
+                          <div>
+                            <Label htmlFor="recipient">Recipient Account Number</Label>
+                            <Input
+                              id="recipient"
+                              placeholder="Enter account number"
+                              value={recipientAccount}
+                              onChange={(e) => setRecipientAccount(e.target.value)}
+                              className="mt-2"
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="transfer-amount">Amount</Label>
+                            <Input
+                              id="transfer-amount"
+                              placeholder="Enter amount"
+                              type="number"
+                              step="0.01"
+                              min="0.01"
+                              max={account.balance}
+                              value={transferAmount}
+                              onChange={(e) => setTransferAmount(e.target.value)}
+                              className="mt-2"
+                              required
+                            />
+                            <div className="text-sm text-gray-500 mt-2">
+                              Available balance: {formatCurrency(account.balance)}
+                            </div>
+                          </div>
+                          <div>
+                            <Label htmlFor="description">Description (Optional)</Label>
+                            <Input
+                              id="description"
+                              placeholder="Add a note"
+                              value={transferDescription}
+                              onChange={(e) => setTransferDescription(e.target.value)}
+                              className="mt-2"
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                            Transfer
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
                 </div>
               </CardFooter>
             </Card>
@@ -222,9 +475,6 @@ const AccountDetail = () => {
                 <CardHeader className="pb-0">
                   <div className="flex justify-between items-center">
                     <CardTitle>Transaction History</CardTitle>
-                    <Button variant="outline" size="sm">
-                      <Download className="h-4 w-4 mr-2" /> Export
-                    </Button>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -245,24 +495,12 @@ const AccountDetail = () => {
                             <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Amount
                             </th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Balance
-                            </th>
                           </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                           {filteredTransactions.map((transaction, index) => {
                             const isCredit = transaction.type === 'Deposit' || 
                               (transaction.type === 'Transfer' && transaction.description.includes('from'));
-                            
-                            // Calculate running balance (simplified, would be more accurate in a real app)
-                            let runningBalance = account.balance;
-                            for (let i = 0; i < index; i++) {
-                              const t = filteredTransactions[i];
-                              const tIsCredit = t.type === 'Deposit' || 
-                                (t.type === 'Transfer' && t.description.includes('from'));
-                              runningBalance -= tIsCredit ? t.amount : -t.amount;
-                            }
                             
                             return (
                               <tr key={transaction.id} className="hover:bg-gray-50">
@@ -294,9 +532,6 @@ const AccountDetail = () => {
                                 }`}>
                                   {isCredit ? '+' : '-'} {formatCurrency(transaction.amount)}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-right">
-                                  {formatCurrency(runningBalance)}
-                                </td>
                               </tr>
                             );
                           })}
@@ -320,7 +555,7 @@ const AccountDetail = () => {
               <Card>
                 <CardHeader>
                   <CardTitle>Account Statements</CardTitle>
-                  <CardDescription>View and download your monthly statements</CardDescription>
+                  <CardDescription>View your monthly statements</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -330,20 +565,24 @@ const AccountDetail = () => {
                       const month = date.toLocaleString('default', { month: 'long' });
                       const year = date.getFullYear();
                       
+                      // Generate random transaction stats for demo
+                      const txnCount = Math.floor(Math.random() * 20) + 5;
+                      const spent = (Math.random() * 10000 + 5000).toFixed(2);
+                      const credited = (Math.random() * 8000 + 3000).toFixed(2);
+                      
                       return (
-                        <div key={i} className="flex items-center justify-between py-3 border-b">
+                        <div key={i} className="p-4 border rounded-lg">
                           <div className="flex items-center">
                             <div className="p-2 rounded-full bg-gray-100 mr-3">
-                              <FileText className="h-5 w-5 text-gray-600" />
+                              <Calendar className="h-5 w-5 text-gray-600" />
                             </div>
                             <div>
                               <p className="font-medium">{month} {year} Statement</p>
-                              <p className="text-sm text-gray-500">PDF • 145 KB</p>
+                              <p className="text-sm text-gray-600 mt-1">
+                                {txnCount} transactions, ${spent} spent, ${credited} credited
+                              </p>
                             </div>
                           </div>
-                          <Button variant="outline" size="sm" className="ml-4">
-                            <Download className="h-4 w-4 mr-2" /> Download
-                          </Button>
                         </div>
                       );
                     })}

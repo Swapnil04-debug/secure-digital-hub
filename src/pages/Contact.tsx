@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { PhoneCall, Mail, Send } from 'lucide-react';
+import { PhoneCall, Mail, MapPin, Send } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -56,8 +56,7 @@ const Contact = () => {
                     <PhoneCall className="h-6 w-6 mr-3 flex-shrink-0" />
                     <div>
                       <p className="font-medium">Call Us</p>
-                      <p className="mt-1">+1 (555) 123-4567</p>
-                      <p className="mt-1">+1 (555) 987-6543</p>
+                      <p className="mt-1">9810369432</p>
                     </div>
                   </div>
                   
@@ -65,8 +64,17 @@ const Contact = () => {
                     <Mail className="h-6 w-6 mr-3 flex-shrink-0" />
                     <div>
                       <p className="font-medium">Email Us</p>
-                      <p className="mt-1">info@securebank.com</p>
-                      <p className="mt-1">support@securebank.com</p>
+                      <p className="mt-1">swapnild102004@gmail.com</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start">
+                    <MapPin className="h-6 w-6 mr-3 flex-shrink-0" />
+                    <div>
+                      <p className="font-medium">Visit Us</p>
+                      <p className="mt-1">
+                        PSP-4, Dr. KN Katju Marg, Sector17, Rohini, New Delhi, Delhi 110089
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -77,11 +85,11 @@ const Contact = () => {
                     <tbody>
                       <tr>
                         <td className="py-1">Monday - Friday:</td>
-                        <td className="text-right">9:00 AM - 6:00 PM</td>
+                        <td className="text-right">9:30 AM - 4:00 PM</td>
                       </tr>
                       <tr>
                         <td className="py-1">Saturday:</td>
-                        <td className="text-right">10:00 AM - 2:00 PM</td>
+                        <td className="text-right">9:30 AM - 4:00 PM</td>
                       </tr>
                       <tr>
                         <td className="py-1">Sunday:</td>
@@ -191,7 +199,7 @@ const Contact = () => {
                     <div>
                       <h3 className="text-lg font-semibold mb-2">Is there a direct number for technical support?</h3>
                       <p className="text-gray-600">
-                        Yes, for technical support, you can call +1 (555) 987-6543 during business hours, or email support@securebank.com anytime.
+                        Yes, for technical support, you can call 9810369432 during business hours, or email swapnild102004@gmail.com anytime.
                       </p>
                     </div>
                   </div>

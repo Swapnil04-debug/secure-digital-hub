@@ -66,9 +66,9 @@ const ContactUs = () => {
               </div>
               <h3 className="text-xl font-semibold mb-2">Visit Us</h3>
               <p className="text-gray-600">
-                123 Banking Street<br />
-                Financial District<br />
-                New York, NY 10001
+                PSP-4, Dr. KN Katju Marg,<br />
+                Sector17, Rohini,<br />
+                New Delhi, Delhi 110089
               </p>
             </div>
 
@@ -79,9 +79,7 @@ const ContactUs = () => {
               <h3 className="text-xl font-semibold mb-2">Call Us</h3>
               <p className="text-gray-600">
                 Customer Service:<br />
-                <a href="tel:+15551234567" className="text-bank-primary hover:underline">+1 (555) 123-4567</a><br />
-                Technical Support:<br />
-                <a href="tel:+15559876543" className="text-bank-primary hover:underline">+1 (555) 987-6543</a>
+                <a href="tel:9810369432" className="text-bank-primary hover:underline">9810369432</a>
               </p>
             </div>
 
@@ -92,9 +90,7 @@ const ContactUs = () => {
               <h3 className="text-xl font-semibold mb-2">Email Us</h3>
               <p className="text-gray-600">
                 General Inquiries:<br />
-                <a href="mailto:info@securebank.com" className="text-bank-primary hover:underline">info@securebank.com</a><br />
-                Customer Support:<br />
-                <a href="mailto:support@securebank.com" className="text-bank-primary hover:underline">support@securebank.com</a>
+                <a href="mailto:swapnild102004@gmail.com" className="text-bank-primary hover:underline">swapnild102004@gmail.com</a>
               </p>
             </div>
 
@@ -105,9 +101,10 @@ const ContactUs = () => {
               <h3 className="text-xl font-semibold mb-2">Hours</h3>
               <p className="text-gray-600">
                 Monday - Friday:<br />
-                9:00 AM - 6:00 PM<br />
+                9:30 AM - 4:00 PM<br />
                 Saturday:<br />
-                10:00 AM - 2:00 PM
+                9:30 AM - 4:00 PM<br />
+                Sunday: Closed
               </p>
             </div>
           </div>
@@ -200,8 +197,8 @@ const ContactUs = () => {
               <div className="w-full h-full flex items-center justify-center">
                 <div className="text-center">
                   <MapPin className="h-12 w-12 text-bank-primary mx-auto mb-4" />
-                  <p className="text-lg font-medium">Map would be displayed here</p>
-                  <p className="text-gray-600">123 Banking Street, Financial District, New York</p>
+                  <p className="text-lg font-medium">PSP-4, Dr. KN Katju Marg</p>
+                  <p className="text-gray-600">Sector17, Rohini, New Delhi, Delhi 110089</p>
                 </div>
               </div>
             </div>
@@ -219,7 +216,7 @@ const ContactUs = () => {
               {[
                 {
                   question: "What are your customer service hours?",
-                  answer: "Our customer service team is available Monday through Friday from 9:00 AM to 6:00 PM, and Saturday from 10:00 AM to 2:00 PM Eastern Time."
+                  answer: "Our customer service team is available Monday through Friday from 9:30 AM to 4:00 PM, and Saturday from 9:30 AM to 4:00 PM. We are closed on Sundays."
                 },
                 {
                   question: "How long does it take to open a new account?",
@@ -227,7 +224,7 @@ const ContactUs = () => {
                 },
                 {
                   question: "How can I report a lost or stolen card?",
-                  answer: "If your card is lost or stolen, please call our 24/7 emergency hotline at +1 (555) 123-8888 immediately to report it and request a replacement."
+                  answer: "If your card is lost or stolen, please call our customer service at 9810369432 immediately to report it and request a replacement."
                 },
                 {
                   question: "Do you have mobile banking?",
