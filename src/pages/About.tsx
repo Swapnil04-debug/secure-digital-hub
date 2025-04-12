@@ -95,33 +95,30 @@ const About = () => {
         </div>
       </section>
 
-      {/* Our Team */}
+      {/* Our Team - Removed photos as requested */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-12 text-center">Our Team Members</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { name: "Swapnil Dixit", title: "Team Member", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" },
-              { name: "Shubham Raj", title: "Team Member", image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" },
-              { name: "Shubham Khandelwal", title: "Team Member", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" },
-              { name: "Radhika", title: "Team Member", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" },
-              { name: "Sanchi", title: "Team Member", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" },
-              { name: "Jeevantika", title: "Team Member", image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&q=80" }
+              { name: "Swapnil Dixit", title: "Team Member" },
+              { name: "Shubham Raj", title: "Team Member" },
+              { name: "Shubham Khandelwal", title: "Team Member" },
+              { name: "Radhika", title: "Team Member" },
+              { name: "Sanchi", title: "Team Member" },
+              { name: "Jeevantika", title: "Team Member" }
             ].map((member, index) => (
-              <div key={index} className="bg-white rounded-lg overflow-hidden shadow-md">
-                <img src={member.image} alt={member.name} className="w-full h-64 object-cover" />
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-1">{member.name}</h3>
-                  <p className="text-gray-600 mb-4">{member.title}</p>
-                </div>
+              <div key={index} className="bg-white rounded-lg overflow-hidden shadow-md p-6 text-center">
+                <h3 className="text-xl font-semibold mb-1">{member.name}</h3>
+                <p className="text-gray-600 mb-4">{member.title}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Tech Stack Section */}
+      {/* Tech Stack Section - Added as requested */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold mb-10 text-center">Tech Stack and Frameworks Used</h2>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Phone, Mail, Clock, MessageSquare } from 'lucide-react';
@@ -79,7 +78,7 @@ const ContactUs = () => {
               <h3 className="text-xl font-semibold mb-2">Call Us</h3>
               <p className="text-gray-600">
                 Customer Service:<br />
-                <a href="tel:9810369432" className="text-bank-primary hover:underline">9810369432</a>
+                <a href="tel:+919551234567" className="text-bank-primary hover:underline">+91 (955) 123-4567</a>
               </p>
             </div>
 
@@ -90,7 +89,7 @@ const ContactUs = () => {
               <h3 className="text-xl font-semibold mb-2">Email Us</h3>
               <p className="text-gray-600">
                 General Inquiries:<br />
-                <a href="mailto:swapnild102004@gmail.com" className="text-bank-primary hover:underline">swapnild102004@gmail.com</a>
+                <a href="mailto:contact@securebank.com" className="text-bank-primary hover:underline">contact@securebank.com</a>
               </p>
             </div>
 

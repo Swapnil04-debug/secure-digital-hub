@@ -44,10 +44,10 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4">Contact</h3>
             <address className="not-italic text-gray-300">
-              <p>123 Banking Street</p>
-              <p>Financial District, NY 10001</p>
+              <p>PSP-4, Dr. KN Katju Marg</p>
+              <p>Sector17, Rohini, New Delhi, Delhi 110089</p>
               <p className="mt-2">contact@securebank.com</p>
-              <p>+1 (555) 123-4567</p>
+              <p>+91 (955) 123-4567</p>
             </address>
           </div>
         </div>
