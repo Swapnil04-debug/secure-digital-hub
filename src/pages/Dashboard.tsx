@@ -1,5 +1,5 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { 
@@ -101,10 +101,29 @@ const AccountCard = ({ account }: { account: Account }) => {
 
 // Main dashboard component
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const { accounts, transactions, deposit, withdraw, transfer, createAccount } = useBank();
   const { toast } = useToast();
-  
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      // Add explicit authentication check
+      if (!isAuthenticated) {
+        console.error('Not authenticated, redirecting to login');
+        navigate('/login');
+        return;
+      }
+
+      // Additional logging for debugging
+      console.log('Dashboard user:', user);
+    } catch (err) {
+      console.error('Dashboard initialization error:', err);
+      setError('Failed to load dashboard');
+    }
+  }, [isAuthenticated, navigate, user]);
+
   // State for dialogs
   const [isNewAccountDialogOpen, setIsNewAccountDialogOpen] = useState(false);
   const [isDepositDialogOpen, setIsDepositDialogOpen] = useState(false);
@@ -271,6 +290,21 @@ const Dashboard = () => {
   const recentTransactions = [...transactions]
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     .slice(0, 5);
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <h2 className="text-2xl font-bold text-red-500">Error Loading Dashboard</h2>
+        <p>{error}</p>
+        <button 
+          onClick={() => navigate('/login')} 
+          className="mt-4 px-4 py-2 bg-bank-primary text-white rounded"
+        >
+          Return to Login
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
