@@ -1,264 +1,261 @@
 
 import React, { useState } from 'react';
-import { useToast } from "@/components/ui/use-toast";
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { Coins, Calculator, CheckCircle, Home, Briefcase, GraduationCap, Car } from 'lucide-react';
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Label } from "@/components/ui/label";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import BankLayout from '@/components/BankLayout';
+import { useToast } from '@/components/ui/use-toast';
+
+interface Loan {
+  id: string;
+  loanType: string;
+  date: string;
+  amount: number;
+  duration: number;
+  installment: number;
+  customerId: string;
+  branchId: string;
+}
 
 const Loans = () => {
   const { toast } = useToast();
-  const [loanAmount, setLoanAmount] = useState(500000);
-  const [tenure, setTenure] = useState(36);
-  const [interestRate, setInterestRate] = useState(10.5);
+  const [loans, setLoans] = useState<Loan[]>([
+    {
+      id: '2001',
+      loanType: 'Home',
+      date: '2025-04-01',
+      amount: 250000.00,
+      duration: 360,
+      installment: 1388.89,
+      customerId: '101',
+      branchId: '1',
+    },
+    {
+      id: '2002',
+      loanType: 'Auto',
+      date: '2025-03-15',
+      amount: 35000.00,
+      duration: 60,
+      installment: 645.00,
+      customerId: '102',
+      branchId: '2',
+    },
+  ]);
 
-  const calculateEMI = () => {
-    const principal = loanAmount;
-    const ratePerMonth = interestRate / 12 / 100;
-    const numPayments = tenure;
-    
-    const emi = (principal * ratePerMonth * Math.pow((1 + ratePerMonth), numPayments)) / (Math.pow((1 + ratePerMonth), numPayments) - 1);
-    
-    return emi.toFixed(0);
+  const [formData, setFormData] = useState({
+    id: '',
+    loanType: '',
+    date: '',
+    amount: '',
+    duration: '',
+    installment: '',
+    customerId: '',
+    branchId: '',
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate form
+    if (!formData.id || !formData.loanType || !formData.date || !formData.amount || !formData.customerId || !formData.branchId) {
+      toast({
+        title: "Missing fields",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Add new loan
+    const newLoan: Loan = {
+      id: formData.id,
+      loanType: formData.loanType,
+      date: formData.date,
+      amount: parseFloat(formData.amount),
+      duration: parseInt(formData.duration) || 0,
+      installment: parseFloat(formData.installment) || 0,
+      customerId: formData.customerId,
+      branchId: formData.branchId,
+    };
+
+    setLoans([...loans, newLoan]);
+    
+    // Reset form
+    setFormData({
+      id: '',
+      loanType: '',
+      date: '',
+      amount: '',
+      duration: '',
+      installment: '',
+      customerId: '',
+      branchId: '',
+    });
+
     toast({
-      title: "Loan Application Submitted",
-      description: "Your loan application has been received. Our team will contact you soon.",
+      title: "Loan added",
+      description: `Loan ${formData.id} has been successfully added`,
     });
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-      
-      <section className="bg-gradient-to-r from-bank-primary to-bank-secondary py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Loans</h1>
-            <p className="text-xl">
-              Get quick and hassle-free loans with competitive interest rates and flexible repayment options.
-            </p>
-          </div>
-        </div>
-      </section>
+    <BankLayout>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Loan Management</h1>
 
-      <section className="py-16 container mx-auto px-4">
-        <div className="max-w-4xl mx-auto grid gap-8">
-          <Tabs defaultValue="apply" className="w-full">
-            <TabsList className="grid grid-cols-2 mb-8">
-              <TabsTrigger value="apply">Apply for Loan</TabsTrigger>
-              <TabsTrigger value="calculator">EMI Calculator</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="apply">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Coins className="mr-2 h-6 w-6 text-bank-primary" />
-                    Loan Application
-                  </CardTitle>
-                  <CardDescription>
-                    Fill out the form below to apply for a loan. Our team will review your application and contact you.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid gap-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="full-name">Full Name</Label>
-                        <Input id="full-name" placeholder="Enter your full name" required />
-                      </div>
-                      
-                      <div className="grid gap-2">
-                        <Label htmlFor="email">Email Address</Label>
-                        <Input id="email" type="email" placeholder="Enter your email address" required />
-                      </div>
-                      
-                      <div className="grid gap-2">
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input id="phone" type="tel" placeholder="Enter your phone number" required />
-                      </div>
-                      
-                      <div className="grid gap-2">
-                        <Label htmlFor="loan-type">Loan Type</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select loan type" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="personal">Personal Loan</SelectItem>
-                            <SelectItem value="home">Home Loan</SelectItem>
-                            <SelectItem value="business">Business Loan</SelectItem>
-                            <SelectItem value="education">Education Loan</SelectItem>
-                            <SelectItem value="vehicle">Vehicle Loan</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="grid gap-2">
-                        <Label htmlFor="loan-amount">Loan Amount (₹)</Label>
-                        <Input id="loan-amount" type="number" placeholder="Enter loan amount" required />
-                      </div>
-                      
-                      <div className="grid gap-2">
-                        <Label htmlFor="tenure">Tenure (Months)</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select tenure" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="12">12 months</SelectItem>
-                            <SelectItem value="24">24 months</SelectItem>
-                            <SelectItem value="36">36 months</SelectItem>
-                            <SelectItem value="48">48 months</SelectItem>
-                            <SelectItem value="60">60 months</SelectItem>
-                            <SelectItem value="72">72 months</SelectItem>
-                            <SelectItem value="84">84 months</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    
-                    <Button type="submit" className="w-full bg-bank-primary hover:bg-bank-primary/90">
-                      Submit Application
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="calculator">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Calculator className="mr-2 h-6 w-6 text-bank-primary" />
-                    EMI Calculator
-                  </CardTitle>
-                  <CardDescription>
-                    Calculate your Equated Monthly Installment (EMI) based on loan amount, interest rate and tenure.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div className="grid gap-4">
-                      <div className="grid gap-2">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="loan-amount-calc">Loan Amount</Label>
-                          <span className="text-sm font-medium">₹{loanAmount.toLocaleString()}</span>
-                        </div>
-                        <Slider
-                          id="loan-amount-calc"
-                          min={100000}
-                          max={10000000}
-                          step={50000}
-                          value={[loanAmount]}
-                          onValueChange={(value) => setLoanAmount(value[0])}
-                          className="py-4"
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>₹1L</span>
-                          <span>₹1Cr</span>
-                        </div>
-                      </div>
-                      
-                      <div className="grid gap-2">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="tenure-calc">Tenure (Months)</Label>
-                          <span className="text-sm font-medium">{tenure} months</span>
-                        </div>
-                        <Slider
-                          id="tenure-calc"
-                          min={12}
-                          max={84}
-                          step={12}
-                          value={[tenure]}
-                          onValueChange={(value) => setTenure(value[0])}
-                          className="py-4"
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>1 year</span>
-                          <span>7 years</span>
-                        </div>
-                      </div>
-                      
-                      <div className="grid gap-2">
-                        <div className="flex items-center justify-between">
-                          <Label htmlFor="interest-rate-calc">Interest Rate (%)</Label>
-                          <span className="text-sm font-medium">{interestRate}%</span>
-                        </div>
-                        <Slider
-                          id="interest-rate-calc"
-                          min={7.5}
-                          max={18}
-                          step={0.5}
-                          value={[interestRate]}
-                          onValueChange={(value) => setInterestRate(value[0])}
-                          className="py-4"
-                        />
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>7.5%</span>
-                          <span>18%</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <Card className="bg-muted/50">
-                      <CardContent className="pt-6">
-                        <div className="text-center">
-                          <div className="text-sm text-muted-foreground mb-1">Your Monthly EMI</div>
-                          <div className="text-3xl font-bold text-bank-primary">₹{calculateEMI()}</div>
-                          <div className="text-sm text-muted-foreground mt-2">
-                            Total Amount: ₹{(parseInt(calculateEMI()) * tenure).toLocaleString()}
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Button className="w-full bg-bank-primary hover:bg-bank-primary/90">
-                      Apply for This Loan
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Add New Loan</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div>
+                <label htmlFor="id" className="block text-sm font-medium mb-1">Loan ID</label>
+                <Input
+                  id="id"
+                  name="id"
+                  value={formData.id}
+                  onChange={handleChange}
+                  placeholder="Loan ID"
+                />
+              </div>
+              <div>
+                <label htmlFor="loanType" className="block text-sm font-medium mb-1">Loan Type</label>
+                <Input
+                  id="loanType"
+                  name="loanType"
+                  value={formData.loanType}
+                  onChange={handleChange}
+                  placeholder="Loan Type"
+                />
+              </div>
+              <div>
+                <label htmlFor="date" className="block text-sm font-medium mb-1">Date</label>
+                <Input
+                  id="date"
+                  name="date"
+                  type="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="amount" className="block text-sm font-medium mb-1">Amount</label>
+                <Input
+                  id="amount"
+                  name="amount"
+                  type="number"
+                  step="0.01"
+                  value={formData.amount}
+                  onChange={handleChange}
+                  placeholder="Amount"
+                />
+              </div>
+              <div>
+                <label htmlFor="duration" className="block text-sm font-medium mb-1">Duration (months)</label>
+                <Input
+                  id="duration"
+                  name="duration"
+                  type="number"
+                  value={formData.duration}
+                  onChange={handleChange}
+                  placeholder="Duration"
+                />
+              </div>
+              <div>
+                <label htmlFor="installment" className="block text-sm font-medium mb-1">Installment</label>
+                <Input
+                  id="installment"
+                  name="installment"
+                  type="number"
+                  step="0.01"
+                  value={formData.installment}
+                  onChange={handleChange}
+                  placeholder="Installment"
+                />
+              </div>
+              <div>
+                <label htmlFor="customerId" className="block text-sm font-medium mb-1">Customer ID</label>
+                <Input
+                  id="customerId"
+                  name="customerId"
+                  value={formData.customerId}
+                  onChange={handleChange}
+                  placeholder="Customer ID"
+                />
+              </div>
+              <div>
+                <label htmlFor="branchId" className="block text-sm font-medium mb-1">Branch ID</label>
+                <Input
+                  id="branchId"
+                  name="branchId"
+                  value={formData.branchId}
+                  onChange={handleChange}
+                  placeholder="Branch ID"
+                />
+              </div>
+              <div className="col-span-1 md:col-span-2 lg:col-span-4 mt-4">
+                <Button type="submit" className="w-full md:w-auto">Submit</Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-            <Card className="text-center py-4">
-              <Home className="h-8 w-8 mx-auto text-bank-primary" />
-              <p className="font-medium mt-2">Home Loan</p>
-              <p className="text-xs text-muted-foreground mt-1">From 8.5% p.a.</p>
-            </Card>
-            <Card className="text-center py-4">
-              <Briefcase className="h-8 w-8 mx-auto text-bank-primary" />
-              <p className="font-medium mt-2">Business Loan</p>
-              <p className="text-xs text-muted-foreground mt-1">From 11% p.a.</p>
-            </Card>
-            <Card className="text-center py-4">
-              <GraduationCap className="h-8 w-8 mx-auto text-bank-primary" />
-              <p className="font-medium mt-2">Education Loan</p>
-              <p className="text-xs text-muted-foreground mt-1">From 9% p.a.</p>
-            </Card>
-            <Card className="text-center py-4">
-              <Car className="h-8 w-8 mx-auto text-bank-primary" />
-              <p className="font-medium mt-2">Car Loan</p>
-              <p className="text-xs text-muted-foreground mt-1">From 9.5% p.a.</p>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      <Footer />
-    </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Loans List</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Loan ID</TableHead>
+                    <TableHead>Loan Type</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Duration</TableHead>
+                    <TableHead>Installment</TableHead>
+                    <TableHead>Customer ID</TableHead>
+                    <TableHead>Branch ID</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loans.map((loan) => (
+                    <TableRow key={loan.id}>
+                      <TableCell>{loan.id}</TableCell>
+                      <TableCell>{loan.loanType}</TableCell>
+                      <TableCell>{loan.date}</TableCell>
+                      <TableCell>${loan.amount.toFixed(2)}</TableCell>
+                      <TableCell>{loan.duration}</TableCell>
+                      <TableCell>${loan.installment.toFixed(2)}</TableCell>
+                      <TableCell>{loan.customerId}</TableCell>
+                      <TableCell>{loan.branchId}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </BankLayout>
   );
 };
 

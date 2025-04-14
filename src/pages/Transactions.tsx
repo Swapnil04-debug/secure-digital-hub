@@ -1,297 +1,204 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { formatDistanceToNow } from 'date-fns';
-import { 
-  ArrowUpRight, ArrowDownLeft, Search, 
-  Filter, ChevronLeft, ChevronRight, RefreshCw
-} from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useBank, Transaction, Account } from '@/context/BankContext';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import BankLayout from '@/components/BankLayout';
+import { useToast } from '@/components/ui/use-toast';
 
-// Helper function to format currency
-const formatCurrency = (amount: number) => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(amount);
-};
-
-// Helper function to format account number
-const formatAccountNumber = (accountNumber: string) => {
-  return `**** ${accountNumber.slice(-4)}`;
-};
+interface Transaction {
+  id: string;
+  transactionType: string;
+  amount: number;
+  date: string;
+  accountId: string;
+}
 
 const Transactions = () => {
-  const navigate = useNavigate();
-  const { accounts, transactions } = useBank();
-  const [selectedAccountId, setSelectedAccountId] = useState<string>('all');
-  const [selectedType, setSelectedType] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  
-  // Filter transactions based on selected filters
-  const filteredTransactions = transactions
-    .filter((transaction) => {
-      // Filter by account
-      if (selectedAccountId !== 'all' && transaction.accountId !== selectedAccountId) {
-        return false;
-      }
-      
-      // Filter by type
-      if (selectedType !== 'all' && transaction.type !== selectedType) {
-        return false;
-      }
-      
-      // Filter by search query
-      if (searchQuery && !transaction.description.toLowerCase().includes(searchQuery.toLowerCase())) {
-        return false;
-      }
-      
-      return true;
-    })
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-  
-  // Pagination
-  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
-  const paginatedTransactions = filteredTransactions.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-  
-  // Get account object by id
-  const getAccountByIdName = (accountId: string) => {
-    const account = accounts.find((a) => a.id === accountId);
-    return account 
-      ? `${account.accountType} (${formatAccountNumber(account.accountNumber)})` 
-      : 'Unknown Account';
+  const { toast } = useToast();
+  const [transactions, setTransactions] = useState<Transaction[]>([
+    {
+      id: '1',
+      transactionType: 'Deposit',
+      amount: 500.00,
+      date: '2025-01-15',
+      accountId: '1',
+    },
+    {
+      id: '2',
+      transactionType: 'Withdrawal',
+      amount: 200.00,
+      date: '2025-01-20',
+      accountId: '1',
+    },
+  ]);
+
+  const [formData, setFormData] = useState({
+    id: '',
+    transactionType: '',
+    amount: '',
+    date: '',
+    accountId: '',
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
-  
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate form
+    if (!formData.id || !formData.transactionType || !formData.amount || !formData.date || !formData.accountId) {
+      toast({
+        title: "Missing fields",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Add new transaction
+    const newTransaction: Transaction = {
+      id: formData.id,
+      transactionType: formData.transactionType,
+      amount: parseFloat(formData.amount),
+      date: formData.date,
+      accountId: formData.accountId,
+    };
+
+    setTransactions([...transactions, newTransaction]);
+    
+    // Reset form
+    setFormData({
+      id: '',
+      transactionType: '',
+      amount: '',
+      date: '',
+      accountId: '',
+    });
+
+    toast({
+      title: "Transaction added",
+      description: `Transaction ${formData.id} has been successfully recorded`,
+    });
+  };
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
+    <BankLayout>
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Transaction Management</h1>
 
-      <main className="flex-grow bg-gray-50 py-8">
-        <div className="container mx-auto px-4">
-          <div className="mb-6 flex items-center">
-            <Button 
-              variant="ghost" 
-              className="mr-2"
-              onClick={() => navigate(-1)}
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" /> Back
-            </Button>
-            <div>
-              <h1 className="text-3xl font-bold">Transaction History</h1>
-              <p className="text-gray-600">View and search through all your transactions</p>
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle>Add New Transaction</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div>
+                <label htmlFor="id" className="block text-sm font-medium mb-1">Transaction ID</label>
+                <Input
+                  id="id"
+                  name="id"
+                  value={formData.id}
+                  onChange={handleChange}
+                  placeholder="Transaction ID"
+                />
+              </div>
+              <div>
+                <label htmlFor="transactionType" className="block text-sm font-medium mb-1">Transaction Type</label>
+                <Input
+                  id="transactionType"
+                  name="transactionType"
+                  value={formData.transactionType}
+                  onChange={handleChange}
+                  placeholder="Transaction Type"
+                />
+              </div>
+              <div>
+                <label htmlFor="amount" className="block text-sm font-medium mb-1">Amount</label>
+                <Input
+                  id="amount"
+                  name="amount"
+                  type="number"
+                  step="0.01"
+                  value={formData.amount}
+                  onChange={handleChange}
+                  placeholder="Amount"
+                />
+              </div>
+              <div>
+                <label htmlFor="date" className="block text-sm font-medium mb-1">Date</label>
+                <Input
+                  id="date"
+                  name="date"
+                  type="date"
+                  value={formData.date}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="accountId" className="block text-sm font-medium mb-1">Account ID</label>
+                <Input
+                  id="accountId"
+                  name="accountId"
+                  value={formData.accountId}
+                  onChange={handleChange}
+                  placeholder="Account ID"
+                />
+              </div>
+              <div className="col-span-1 md:col-span-2 lg:col-span-5 mt-4">
+                <Button type="submit" className="w-full md:w-auto">Submit</Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Transactions List</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Transaction ID</TableHead>
+                    <TableHead>Transaction Type</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Account ID</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {transactions.map((transaction) => (
+                    <TableRow key={transaction.id}>
+                      <TableCell>{transaction.id}</TableCell>
+                      <TableCell>{transaction.transactionType}</TableCell>
+                      <TableCell>${transaction.amount.toFixed(2)}</TableCell>
+                      <TableCell>{transaction.date}</TableCell>
+                      <TableCell>{transaction.accountId}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
-          </div>
-
-          {/* Filters and Search */}
-          <Card className="mb-6">
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Account
-                  </label>
-                  <Select
-                    value={selectedAccountId}
-                    onValueChange={setSelectedAccountId}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select account" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Accounts</SelectItem>
-                      {accounts.map((account) => (
-                        <SelectItem key={account.id} value={account.id}>
-                          {account.accountType} ({formatAccountNumber(account.accountNumber)})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Transaction Type
-                  </label>
-                  <Select
-                    value={selectedType}
-                    onValueChange={setSelectedType}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Types</SelectItem>
-                      <SelectItem value="Deposit">Deposits</SelectItem>
-                      <SelectItem value="Withdrawal">Withdrawals</SelectItem>
-                      <SelectItem value="Transfer">Transfers</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Search by Description
-                  </label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                    <Input
-                      className="pl-9"
-                      placeholder="Search transactions..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Transactions List */}
-          <Card>
-            <CardHeader className="pb-0">
-              <div className="flex justify-between items-center">
-                <CardTitle>
-                  {filteredTransactions.length} 
-                  {filteredTransactions.length === 1 ? ' Transaction' : ' Transactions'}
-                </CardTitle>
-                <Button variant="ghost" size="sm" className="text-gray-500">
-                  <RefreshCw className="h-4 w-4 mr-2" /> Refresh
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {paginatedTransactions.length > 0 ? (
-                <>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead>
-                        <tr className="bg-gray-50">
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Date
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Description
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Account
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Type
-                          </th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Amount
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {paginatedTransactions.map((transaction) => {
-                          const isCredit = transaction.type === 'Deposit' || 
-                            (transaction.type === 'Transfer' && transaction.description.includes('from'));
-                          
-                          return (
-                            <tr key={transaction.id} className="hover:bg-gray-50">
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {new Date(transaction.timestamp).toLocaleDateString()}
-                                <div className="text-xs text-gray-400">
-                                  {formatDistanceToNow(new Date(transaction.timestamp), { addSuffix: true })}
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {transaction.description}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {getAccountByIdName(transaction.accountId)}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                  transaction.type === 'Deposit' 
-                                    ? 'bg-green-100 text-green-800' 
-                                    : transaction.type === 'Withdrawal'
-                                    ? 'bg-red-100 text-red-800'
-                                    : 'bg-blue-100 text-blue-800'
-                                }`}>
-                                  {transaction.type === 'Deposit' && <ArrowDownLeft className="h-3 w-3 mr-1" />}
-                                  {transaction.type === 'Withdrawal' && <ArrowUpRight className="h-3 w-3 mr-1" />}
-                                  {transaction.type === 'Transfer' && <RefreshCw className="h-3 w-3 mr-1" />}
-                                  {transaction.type}
-                                </span>
-                              </td>
-                              <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-right ${
-                                isCredit ? 'text-green-600' : 'text-red-600'
-                              }`}>
-                                {isCredit ? '+' : '-'} {formatCurrency(transaction.amount)}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Pagination */}
-                  {totalPages > 1 && (
-                    <div className="flex items-center justify-between mt-6">
-                      <div className="text-sm text-gray-500">
-                        Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-                        {Math.min(currentPage * itemsPerPage, filteredTransactions.length)} of{' '}
-                        {filteredTransactions.length} transactions
-                      </div>
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                          disabled={currentPage === 1}
-                        >
-                          <ChevronLeft className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                          disabled={currentPage === totalPages}
-                        >
-                          <ChevronRight className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <div className="text-center py-12">
-                  <Filter className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-                  <h3 className="text-lg font-medium mb-2">No transactions found</h3>
-                  <p className="text-gray-500 mb-4">
-                    Try adjusting your filters or search criteria
-                  </p>
-                  <Button 
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedAccountId('all');
-                      setSelectedType('all');
-                      setSearchQuery('');
-                    }}
-                  >
-                    Clear Filters
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-
-      <Footer />
-    </div>
+          </CardContent>
+        </Card>
+      </div>
+    </BankLayout>
   );
 };
 

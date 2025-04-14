@@ -9,7 +9,163 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      accounts: {
+        Row: {
+          account_id: string
+          account_type: string | null
+          balance: number | null
+          opening_date: string | null
+        }
+        Insert: {
+          account_id?: string
+          account_type?: string | null
+          balance?: number | null
+          opening_date?: string | null
+        }
+        Update: {
+          account_id?: string
+          account_type?: string | null
+          balance?: number | null
+          opening_date?: string | null
+        }
+        Relationships: []
+      }
+      branches: {
+        Row: {
+          address: string | null
+          branch_id: string
+          branch_name: string
+          city: string | null
+          contact_no: string | null
+          manager: string | null
+        }
+        Insert: {
+          address?: string | null
+          branch_id?: string
+          branch_name: string
+          city?: string | null
+          contact_no?: string | null
+          manager?: string | null
+        }
+        Update: {
+          address?: string | null
+          branch_id?: string
+          branch_name?: string
+          city?: string | null
+          contact_no?: string | null
+          manager?: string | null
+        }
+        Relationships: []
+      }
+      customer_account: {
+        Row: {
+          account_id: string
+          branch_id: string | null
+          cust_id: string
+        }
+        Insert: {
+          account_id?: string
+          branch_id?: string | null
+          cust_id?: string
+        }
+        Update: {
+          account_id?: string
+          branch_id?: string | null
+          cust_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_account_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["account_id"]
+          },
+          {
+            foreignKeyName: "customer_account_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["branch_id"]
+          },
+          {
+            foreignKeyName: "customer_account_cust_id_fkey"
+            columns: ["cust_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["cust_id"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          address: string | null
+          contact_no: string | null
+          cust_id: string
+          name: string
+        }
+        Insert: {
+          address?: string | null
+          contact_no?: string | null
+          cust_id?: string
+          name: string
+        }
+        Update: {
+          address?: string | null
+          contact_no?: string | null
+          cust_id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      departments: {
+        Row: {
+          branch_id: string
+          contact_no: string | null
+          dept_id: string
+          dept_name: string | null
+        }
+        Insert: {
+          branch_id?: string
+          contact_no?: string | null
+          dept_id?: string
+          dept_name?: string | null
+        }
+        Update: {
+          branch_id?: string
+          contact_no?: string | null
+          dept_id?: string
+          dept_name?: string | null
+        }
+        Relationships: []
+      }
+      employees: {
+        Row: {
+          address: string | null
+          contact_no: string | null
+          designation: string | null
+          emp_id: string
+          name: string
+          salary: number | null
+        }
+        Insert: {
+          address?: string | null
+          contact_no?: string | null
+          designation?: string | null
+          emp_id?: string
+          name: string
+          salary?: number | null
+        }
+        Update: {
+          address?: string | null
+          contact_no?: string | null
+          designation?: string | null
+          emp_id?: string
+          name?: string
+          salary?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

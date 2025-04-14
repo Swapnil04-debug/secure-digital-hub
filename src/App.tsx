@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -25,6 +26,13 @@ import { AuthProvider } from "./context/AuthContext";
 import { BankProvider } from "./context/BankContext";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 
+// New bank management pages
+import Accounts from "./pages/Accounts";
+import Branches from "./pages/Branches";
+import Customers from "./pages/Customers";
+import Departments from "./pages/Departments";
+import Employees from "./pages/Employees";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -37,6 +45,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/home" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/dashboard" element={<Dashboard />} />
@@ -53,6 +62,14 @@ const App = () => (
               <Route path="/loans" element={<Loans />} />
               <Route path="/investments" element={<Investments />} />
               <Route path="/application-status" element={<ApplicationStatus />} />
+              
+              {/* New bank management routes */}
+              <Route path="/accounts" element={<Accounts />} />
+              <Route path="/branches" element={<Branches />} />
+              <Route path="/customers" element={<Customers />} />
+              <Route path="/departments" element={<Departments />} />
+              <Route path="/employees" element={<Employees />} />
+              
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
