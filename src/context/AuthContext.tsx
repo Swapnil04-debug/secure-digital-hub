@@ -5,8 +5,13 @@ import { User, Session } from '@supabase/supabase-js';
 import { toast } from '@/components/ui/use-toast';
 
 // Define types
+interface UserWithMetadata extends User {
+  // Add name property to the extended User type
+  name?: string; 
+}
+
 type AuthContextType = {
-  user: User | null;
+  user: UserWithMetadata | null;
   session: Session | null;
   isAuthenticated: boolean;
   isLoading: boolean;
@@ -27,7 +32,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserWithMetadata | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -35,16 +40,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
+        if (currentSession) {
+          // Process user info to add name from metadata
+          const userData: UserWithMetadata = currentSession.user;
+          if (userData.user_metadata && userData.user_metadata.full_name) {
+            userData.name = userData.user_metadata.full_name;
+          }
+          setUser(userData);
+        } else {
+          setUser(null);
+        }
         setSession(currentSession);
-        setUser(currentSession?.user ?? null);
         console.log('Auth state changed:', event, currentSession?.user?.email);
       }
     );
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      if (currentSession) {
+        // Process user info to add name from metadata
+        const userData: UserWithMetadata = currentSession.user;
+        if (userData.user_metadata && userData.user_metadata.full_name) {
+          userData.name = userData.user_metadata.full_name;
+        }
+        setUser(userData);
+      } else {
+        setUser(null);
+      }
       setSession(currentSession);
-      setUser(currentSession?.user ?? null);
       setIsLoading(false);
     });
 
@@ -65,6 +88,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           variant: "destructive",
         });
         return false;
+      }
+
+      // Process user info to add name from metadata
+      if (data.user && data.user.user_metadata && data.user.user_metadata.full_name) {
+        const userData = data.user as UserWithMetadata;
+        userData.name = data.user.user_metadata.full_name;
+        setUser(userData);
       }
 
       toast({
@@ -103,6 +133,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           variant: "destructive",
         });
         return false;
+      }
+
+      // Process user info to add name from metadata
+      if (data.user) {
+        const userData = data.user as UserWithMetadata;
+        userData.name = name;
+        setUser(userData);
       }
 
       toast({

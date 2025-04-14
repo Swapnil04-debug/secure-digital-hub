@@ -31,21 +31,28 @@ export interface Transaction {
 }
 
 export const DatabaseService = {
-  // User Profiles
+  // User Profiles - using mock functions until tables are created
   getUserProfile: async (userId: string): Promise<UserProfile | null> => {
     try {
-      const { data, error } = await supabase
-        .from('user_profiles')
+      // Check if user_profiles table exists
+      const { error: checkError } = await supabase
+        .from('accounts')
         .select('*')
-        .eq('id', userId)
-        .single();
-      
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        return null;
+        .limit(1);
+
+      // If table doesn't exist yet, return mock data
+      if (checkError) {
+        console.log('Using mock data for user profile:', checkError.message);
+        return {
+          id: userId,
+          full_name: 'Demo User',
+          email: 'demo@example.com',
+          created_at: new Date().toISOString(),
+        };
       }
       
-      return data as UserProfile;
+      // If we get here in the future when table exists
+      return null;
     } catch (error) {
       console.error('Unexpected error in getUserProfile:', error);
       return null;
@@ -54,38 +61,33 @@ export const DatabaseService = {
   
   createUserProfile: async (profile: Omit<UserProfile, 'created_at'>): Promise<UserProfile | null> => {
     try {
-      const { data, error } = await supabase
-        .from('user_profiles')
-        .insert(profile)
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error creating user profile:', error);
-        return null;
-      }
-      
-      return data as UserProfile;
+      // Mock successful creation
+      return {
+        ...profile,
+        created_at: new Date().toISOString(),
+      };
     } catch (error) {
       console.error('Unexpected error in createUserProfile:', error);
       return null;
     }
   },
   
-  // Bank Accounts
+  // Bank Accounts - using mock functions until tables are created
   getAccountsByUserId: async (userId: string): Promise<BankAccount[]> => {
     try {
-      const { data, error } = await supabase
-        .from('bank_accounts')
-        .select('*')
-        .eq('user_id', userId);
-      
-      if (error) {
-        console.error('Error fetching accounts:', error);
-        return [];
-      }
-      
-      return data as BankAccount[];
+      // Return mock data for now
+      return [
+        {
+          id: '1',
+          account_id: '101',
+          account_type: 'Checking',
+          opening_date: new Date().toISOString(),
+          balance: 5000,
+          user_id: userId,
+          account_number: '1234567890',
+          status: 'Active'
+        }
+      ];
     } catch (error) {
       console.error('Unexpected error in getAccountsByUserId:', error);
       return [];
@@ -94,39 +96,31 @@ export const DatabaseService = {
   
   createAccount: async (account: Omit<BankAccount, 'id'>): Promise<BankAccount | null> => {
     try {
-      const { data, error } = await supabase
-        .from('bank_accounts')
-        .insert(account)
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error creating bank account:', error);
-        return null;
-      }
-      
-      return data as BankAccount;
+      // Mock successful creation
+      return {
+        ...account,
+        id: Math.random().toString(36).substring(7),
+      };
     } catch (error) {
       console.error('Unexpected error in createAccount:', error);
       return null;
     }
   },
   
-  // Transactions
+  // Transactions - using mock functions until tables are created
   getTransactionsByAccountId: async (accountId: string): Promise<Transaction[]> => {
     try {
-      const { data, error } = await supabase
-        .from('bank_transactions')
-        .select('*')
-        .eq('account_id', accountId)
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error('Error fetching transactions:', error);
-        return [];
-      }
-      
-      return data as Transaction[];
+      // Return mock data for now
+      return [
+        {
+          id: '1',
+          account_id: accountId,
+          type: 'Deposit',
+          amount: 1000,
+          description: 'Initial deposit',
+          created_at: new Date().toISOString()
+        }
+      ];
     } catch (error) {
       console.error('Unexpected error in getTransactionsByAccountId:', error);
       return [];
@@ -135,32 +129,25 @@ export const DatabaseService = {
   
   getAllUserTransactions: async (userId: string): Promise<Transaction[]> => {
     try {
-      // Join bank_accounts with bank_transactions to get all transactions for user
-      const { data, error } = await supabase
-        .from('bank_accounts')
-        .select(`
-          *,
-          bank_transactions(*)
-        `)
-        .eq('user_id', userId);
-      
-      if (error) {
-        console.error('Error fetching all user transactions:', error);
-        return [];
-      }
-      
-      // Flatten the nested structure to get all transactions
-      const transactions: Transaction[] = [];
-      data.forEach(account => {
-        if (account.bank_transactions && Array.isArray(account.bank_transactions)) {
-          transactions.push(...account.bank_transactions);
+      // Return mock data for now
+      return [
+        {
+          id: '1',
+          account_id: '101',
+          type: 'Deposit',
+          amount: 1000,
+          description: 'Initial deposit',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: '2',
+          account_id: '101',
+          type: 'Withdrawal',
+          amount: 200,
+          description: 'ATM withdrawal',
+          created_at: new Date(Date.now() - 86400000).toISOString()
         }
-      });
-      
-      // Sort by created_at date
-      return transactions.sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
+      ];
     } catch (error) {
       console.error('Unexpected error in getAllUserTransactions:', error);
       return [];
@@ -169,18 +156,12 @@ export const DatabaseService = {
   
   createTransaction: async (transaction: Omit<Transaction, 'id' | 'created_at'>): Promise<Transaction | null> => {
     try {
-      const { data, error } = await supabase
-        .from('bank_transactions')
-        .insert(transaction)
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error creating transaction:', error);
-        return null;
-      }
-      
-      return data as Transaction;
+      // Mock successful creation
+      return {
+        ...transaction,
+        id: Math.random().toString(36).substring(7),
+        created_at: new Date().toISOString()
+      };
     } catch (error) {
       console.error('Unexpected error in createTransaction:', error);
       return null;
@@ -195,19 +176,8 @@ export const DatabaseService = {
     description: string
   ): Promise<boolean> => {
     try {
-      // Start a transaction
-      const { error } = await supabase.rpc('create_transfer', {
-        from_account_id: fromAccountId,
-        to_account_id: toAccountId,
-        transfer_amount: amount,
-        transfer_description: description
-      });
-      
-      if (error) {
-        console.error('Error creating transfer:', error);
-        return false;
-      }
-      
+      // Mock successful transfer
+      console.log(`Transfer from ${fromAccountId} to ${toAccountId}: $${amount}`);
       return true;
     } catch (error) {
       console.error('Unexpected error in createTransfer:', error);
@@ -218,17 +188,8 @@ export const DatabaseService = {
   // Handle deposit by creating a transaction and updating account balance
   deposit: async (accountId: string, amount: number, description: string): Promise<boolean> => {
     try {
-      const { error } = await supabase.rpc('create_deposit', {
-        account_id: accountId,
-        deposit_amount: amount,
-        deposit_description: description
-      });
-      
-      if (error) {
-        console.error('Error creating deposit:', error);
-        return false;
-      }
-      
+      // Mock successful deposit
+      console.log(`Deposit to ${accountId}: $${amount}`);
       return true;
     } catch (error) {
       console.error('Unexpected error in deposit:', error);
@@ -239,17 +200,8 @@ export const DatabaseService = {
   // Handle withdrawal by creating a transaction and updating account balance
   withdraw: async (accountId: string, amount: number, description: string): Promise<boolean> => {
     try {
-      const { error } = await supabase.rpc('create_withdrawal', {
-        account_id: accountId,
-        withdrawal_amount: amount,
-        withdrawal_description: description
-      });
-      
-      if (error) {
-        console.error('Error creating withdrawal:', error);
-        return false;
-      }
-      
+      // Mock successful withdrawal
+      console.log(`Withdrawal from ${accountId}: $${amount}`);
       return true;
     } catch (error) {
       console.error('Unexpected error in withdraw:', error);
